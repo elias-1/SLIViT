@@ -227,56 +227,68 @@ def get_dataloaders(dataset_class, args):
         if args.medmnist_mocks is not None:
             msg += f'Running a mock version of the dataset with {args.medmnist_mocks} samples only!!'
 
-        train_subset = Subset(train_subset,
+        train_dataset = Subset(train_subset,
                               np.arange(args.medmnist_mocks if args.medmnist_mocks else len(train_subset)))
-        valid_subset = Subset(valid_subset,
+        val_dataset = Subset(valid_subset,
                               np.arange(args.medmnist_mocks if args.medmnist_mocks else len(valid_subset)))
-        test_subset = Subset(test_subset, np.arange(args.medmnist_mocks if args.medmnist_mocks else len(test_subset)))
+        test_dataset = Subset(test_subset, np.arange(args.medmnist_mocks if args.medmnist_mocks else len(test_subset)))
 
         # dataset  = ConcatDataset([train_subset, valid_subset, test_subset])
     else:
-        train_indices, valid_indices, test_indices = get_split_indices(args.meta, args.out_dir,
-                                                                       args.split_ratio, args.label,
-                                                                       args.split_col, args.pid_col)
-        dataset = dataset_class(args.meta, args.label, args.path_col,
+        # train_indices, valid_indices, test_indices = get_split_indices(args.meta, args.out_dir,
+        #                                                                args.split_ratio, args.label,
+        #                                                                args.split_col, args.pid_col)
+        train_dataset = dataset_class(args.meta, args.label, args.path_col,
                                 num_slices_to_use=args.slices,
                                 sparsing_method=args.sparsing_method,
-                                img_suffix=args.img_suffix)
+                                img_suffix=args.img_suffix,
+                                train_val_test='train')
 
-        train_subset = Subset(dataset, train_indices)
-        valid_subset = Subset(dataset, valid_indices)
-        if len(test_indices) > 0:
-            # assert args.split_ratio[2] > 0, 'Test set is not empty but split_ratio[2] is 0'
-            # internal test set
-            msg = f'Using internal test set for final model evaluation'
-            if args.split_ratio[2] == 0:
-                msg += ' (split_ratio 0 is overridden by a pre-defined split)'
-            test_subset = Subset(dataset, test_indices)
-        else:
-            # external test set
-            assert args.split_ratio[2] == 0, 'Test set is empty but split_ratio[2] is not 0'
-            if args.test_meta is None:
-                msg = 'No model evaluation will be done (test ratio was set to 0 and no test_meta was provided).'
-                test_subset = Subset(dataset, [])  # empty test set
-            else:
-                msg = f'Using external test set for final model evaluation from:\n{args.test_meta}'
-                test_df = pd.read_csv(args.test_meta)
-                test_subset = Subset(dataset_class(test_df, args.label, args.path_col,
-                                                   num_slices_to_use=args.slices,
-                                                   sparsing_method=args.sparsing_method,
-                                                   img_suffix=args.img_suffix),
-                                     np.arange(len(test_df)))
+        val_dataset = dataset_class(args.meta, args.label, args.path_col,
+                                      num_slices_to_use=args.slices,
+                                      sparsing_method=args.sparsing_method,
+                                      img_suffix=args.img_suffix,
+                                      train_val_test='val')
+        test_dataset = dataset_class(args.meta, args.label, args.path_col,
+                                      num_slices_to_use=args.slices,
+                                      sparsing_method=args.sparsing_method,
+                                      img_suffix=args.img_suffix,
+                                      train_val_test='test')
+
+        # train_subset = Subset(dataset, train_indices)
+        # valid_subset = Subset(dataset, valid_indices)
+        # if len(test_indices) > 0:
+        #     # assert args.split_ratio[2] > 0, 'Test set is not empty but split_ratio[2] is 0'
+        #     # internal test set
+        #     msg = f'Using internal test set for final model evaluation'
+        #     if args.split_ratio[2] == 0:
+        #         msg += ' (split_ratio 0 is overridden by a pre-defined split)'
+        #     test_subset = Subset(dataset, test_indices)
+        # else:
+        #     # external test set
+        #     assert args.split_ratio[2] == 0, 'Test set is empty but split_ratio[2] is not 0'
+        #     if args.test_meta is None:
+        #         msg = 'No model evaluation will be done (test ratio was set to 0 and no test_meta was provided).'
+        #         test_subset = Subset(dataset, [])  # empty test set
+        #     else:
+        #         msg = f'Using external test set for final model evaluation from:\n{args.test_meta}'
+        #         test_df = pd.read_csv(args.test_meta)
+        #         test_subset = Subset(dataset_class(test_df, args.label, args.path_col,
+        #                                            num_slices_to_use=args.slices,
+        #                                            sparsing_method=args.sparsing_method,
+        #                                            img_suffix=args.img_suffix),
+        #                              np.arange(len(test_df)))
 
     if msg and get_script_name() != 'evaluate':
         logger.info('\n\n' + '*' * 100 + f'\n{msg}\n' + '*' * 100 + '\n')
 
     logger.info(f'Num of cpus is {args.cpus}')
 
-    train_loader = DataLoader(train_subset, batch_size=args.batch_size, num_workers=args.cpus, drop_last=True)
+    train_loader = DataLoader(train_dataset, batch_size=args.batch_size, num_workers=args.cpus, drop_last=True)
     logger.info(f'# of train batches is {len(train_loader)}')
-    valid_loader = DataLoader(valid_subset, batch_size=args.batch_size, num_workers=args.cpus, drop_last=True)
+    valid_loader = DataLoader(val_dataset, batch_size=args.batch_size, num_workers=args.cpus, drop_last=True)
     logger.info(f'# of validation batches is {len(valid_loader)}')
-    test_loader = DataLoader(test_subset, batch_size=args.batch_size, num_workers=args.cpus, drop_last=True)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, num_workers=args.cpus, drop_last=True)
     logger.info(f'# of Test batches is {len(test_loader)}\n')
     return train_loader, valid_loader, test_loader
 

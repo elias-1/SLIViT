@@ -21,7 +21,7 @@ class SLIViTDataset3D(SLIViTDataset):
         return transformed_scan, label.squeeze(0)  # TODO: Consider adding EHR info
 
     def get_slices_indexes(self, vol_path, num_slices_to_use):
-        total_num_of_slices = len(list(filter(self.filter, os.listdir(vol_path))))
+        total_num_of_slices = self.meta_info[os.path.basename(vol_path).split('.')[0]][0]
         assert total_num_of_slices > 0, f"No images found in {vol_path}"
         if self.sparsing_method == 'eq':
             # equally-spaced down sample the slices

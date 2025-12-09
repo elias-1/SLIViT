@@ -14,7 +14,7 @@ parser.add_argument('--test_meta', type=str, default=None,
                     help='Path to external test set CSV file (uses internal test set by default).')
 parser.add_argument('--label', type=lambda x: x.split(','),
                     help='Goal of the learning task (comma-separated if more than one).')
-parser.add_argument('--dataset_name', type=str, required=True,
+parser.add_argument('--dataset', type=str, required=True,
                     choices=['oct2d', 'xray2d', 'custom2d', 'oct3d', 'us3d', 'mri3d', 'ct3d', 'custom3d'])
 parser.add_argument('--drop_default_suffix', action='store_true',
                     help='Drop the default suffix from the output directory path.')
