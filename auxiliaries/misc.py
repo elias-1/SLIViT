@@ -36,8 +36,8 @@ def assert_input_is_valid(args):
 
     # Import the optional medmnist class if present
     args.medmnist_dataset = None
-    if args.dataset_name in medmnist_classes:
-        medmnist_class_name = medmnist_classes[args.dataset_name]
+    if args.dataset in medmnist_classes:
+        medmnist_class_name = medmnist_classes[args.dataset]
         medmnist_module = __import__('medmnist', fromlist=[medmnist_class_name])
         args.medmnist_dataset = getattr(medmnist_module, medmnist_class_name)
 
@@ -93,9 +93,9 @@ def init_out_dir(args):
         if args.meta is not None:
             # example args.meta: ./meta/echonet.csv
             csv_file_name = os.path.splitext(args.meta.split("/")[-1])[0]  # remove extension
-            out_dir = f'{out_dir}/{csv_file_name}' + (f'_{args.label[0]}' if len(args.label) == 1 else '')
+            out_dir = f'{out_dir}/{csv_file_name}'
         else:
-            out_dir = f'{out_dir}/{"mock_" if args.medmnist_mocks else ""}{args.dataset_name}'
+            out_dir = f'{out_dir}/{"mock_" if args.medmnist_mocks else ""}{args.dataset}'
 
     if args.out_suffix is not None:
         # subfolders for hp search
@@ -194,7 +194,7 @@ def get_split_indices(meta, out_dir, split_ratio, pathology, split_col, pid_col)
 
 
 def setup_dataloaders(args):
-    dataset_class = get_dataset_class(args.dataset_name)
+    dataset_class = get_dataset_class(args.dataset)
     assert args.meta is not None or \
            args.medmnist_dataset is not None, \
         'Meta file is required for non-MedMNIST datasets. Please provide the meta file path.'
@@ -210,7 +210,7 @@ def get_dataloaders(dataset_class, args):
         # TODO: make sure test returns empty when pretraining (use all samples for pretraining)
         if args.medmnist_mocks:
             size = 28
-        elif 'xray' in args.dataset_name:
+        elif 'xray' in args.dataset:
             # chestmnist
             size = 224
         else:
@@ -293,19 +293,19 @@ def get_dataloaders(dataset_class, args):
     return train_loader, valid_loader, test_loader
 
 
-def get_dataset_class(dataset_name):
+def get_dataset_class(dataset):
     # Dictionary mapping dataset names to dataset classes
-    dataset_name_to_class_name = {'xray2d': 'MedMNISTDataset2D', 'oct2d': 'OCTDataset2D',
+    dataset_to_class_name = {'xray2d': 'MedMNISTDataset2D', 'oct2d': 'OCTDataset2D',
                                   'custom2d': 'CustomDataset2D',
                                   'oct3d': 'OCTDataset3D', 'us3d': 'USDataset3D',
                                   'mri3d': 'MRIDataset3D', 'ct3d': 'MedMNISTDataset3D',
                                   'custom3d': 'CustomDataset3D'}
 
-    assert dataset_name in dataset_name_to_class_name, \
-        f'Unknown dataset option. Please choose from: {list(dataset_name_to_class_name.keys())}'
+    assert dataset in dataset_to_class_name, \
+        f'Unknown dataset option. Please choose from: {list(dataset_to_class_name.keys())}'
 
     # Import the dataset class dynamically
-    class_name = dataset_name_to_class_name[dataset_name]
+    class_name = dataset_to_class_name[dataset]
     dataset_module = __import__(f'datasets.{class_name}', fromlist=[class_name])
     dataset_class = getattr(dataset_module, class_name)
 
