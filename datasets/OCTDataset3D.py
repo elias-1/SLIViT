@@ -13,9 +13,6 @@ class OCTDataset3D(SLIViTDataset3D):
     #  example image name of Houston: 12.tiff  ->  012
 
     def __init__(self, meta, label_name, path_col_name, **kwargs):
-        self.labels = meta[label_name].values
-        self.scan_paths = meta[path_col_name].values#.apply(lambda x: f'/scratch/avram/Kermany/{x}').values #TOOD: delete this
-
         with open(os.path.join(os.path.dirname(meta), "meta_info.json"), 'r') as f:
             self.meta_info = json.load(f)
 
