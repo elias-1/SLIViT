@@ -7,7 +7,7 @@ from einops.layers.torch import Rearrange
 class SLIViT(ViT):
     def __init__(self, *, feature_extractor, vit_dim, vit_depth, heads, mlp_dim,
                  num_of_patches, dropout=0., emb_dropout=0., patch_height=768,
-                 patch_width=64, rnd_pos_emb=False, num_classes=1, dim_head=64):
+                 patch_width=64, rnd_pos_emb=False, num_classes=8, dim_head=64):
 
         super().__init__(image_size=(patch_height * num_of_patches, patch_width),
                          patch_size=(patch_height, patch_width),
