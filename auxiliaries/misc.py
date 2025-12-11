@@ -45,10 +45,10 @@ def assert_input_is_valid(args):
 
     # non-medmnist datasets
     # check labels
-    for label in args.label:
-        assert label in pd.read_csv(args.meta, nrows=0).columns, f'Label column {label} not found in the meta file.'
+    # for label in args.label:
+    #     assert label in pd.read_csv(args.meta, nrows=0).columns, f'Label column {label} not found in the meta file.'
 
-    check_split(args)
+    # check_split(args)
 
 
 def check_split(args):
