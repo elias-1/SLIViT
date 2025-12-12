@@ -16,7 +16,7 @@ class OCTDataset3D(SLIViTDataset3D):
         with open(os.path.join(os.path.dirname(meta), "meta_info.json"), 'r') as f:
             self.meta_info = json.load(f)
 
-        with open(os.path.join(os.path.dirname(meta), "train_val_test.json"), 'r') as f:
+        with open(os.path.join(os.path.dirname(meta), "train_val_test2.json"), 'r') as f:
             self.train_val_test = json.load(f)
         self.patient_info = self.train_val_test[kwargs.get('train_val_test')]
 
