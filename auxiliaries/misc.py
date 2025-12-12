@@ -392,10 +392,10 @@ def print_and_store_scores(learner, evaluation_loader, out_dir, preds=None):
 
     metric_names = ['loss_score'] + [m.name for m in learner.metrics]  # loss is not included in the metrics
     for metric_score, metric_name in zip(metric_scores, metric_names):
-        logger.info(f'{metric_name}: {metric_score:.5f}' + (('\n' + '*' * 100)
+        logger.info(f'{metric_name}: {str(metric_score)}' + (('\n' + '*' * 100)
                                                             if metric_name == metric_names[-1] else ''))
         with open(f'{out_dir}/{metric_name}.txt', 'w') as f:
-            f.write(f'{metric_score:.5f}\n')
+            f.write(f'{str(metric_score)}\n')
     logger.info(f'Running result is saved at:\n{out_dir}')
 
 
