@@ -406,7 +406,7 @@ def evaluate(learner, data_loader, weights_path, out_dir, meta, pid_col, path_co
             hasattr(data_loader, 'get_idxs') and len(data_loader.get_idxs()) > 0:
         learner.model.to('cuda')
         learner.load(weights_path.split('/')[-1].split('.pth')[0])
-        preds = store_predictions(learner, data_loader, out_dir, meta, label, pid_col, path_col, split_col)
+        # preds = store_predictions(learner, data_loader, out_dir, meta, label, pid_col, path_col, split_col)
         print_and_store_scores(learner, data_loader, out_dir)
     else:
         # evaluation_loader is empty
