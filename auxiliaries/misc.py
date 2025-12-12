@@ -316,7 +316,7 @@ def get_loss_and_metrics(task):
     if task == 'cls':
         loss_f = torch.nn.BCEWithLogitsLoss()  # TODO: consider using CrossEntropyLoss
         # metrics = [RocAucMulti(average=None), APScoreMulti(average=None)]
-        metrics = [RocAucMulti(), APScoreMulti()]
+        metrics = [RocAucMulti(), APScoreMulti(), RocAucMulti(average=None), APScoreMulti(average=None)]
     elif task == 'reg':
         loss_f = torch.nn.L1Loss()
         metrics = [R2Score(), ExplainedVariance(), PearsonCorrCoef()]
